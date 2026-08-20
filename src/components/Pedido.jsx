@@ -1,4 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { useState } from 'react'
+import "../css/estilo.css"
+
 
 //Array de objetos contendo o estado inicial do cardapio
 const cardapio=[
@@ -33,7 +36,7 @@ const Pedido = () => {
                 //atualiza apenas a quantidade mantendo o resto
                 //Math.max : garante que a quantidade nunca será menor que 0:
                 //Item: retorna o item intacto caso o id não corresponda
-                item.id==id ?{...item,quantidade: Math.max(0,item.quantidade + valor)}: items
+                item.id==id ?{...item,quantidade: Math.max(0,item.quantidade + valor)}: item
             )
 
         )
@@ -50,7 +53,7 @@ const Pedido = () => {
     //SIMULAÇÃO DO CICLO DE VIDA DA ENTREGA USANDO TEMPORIZADORES ASSINCRONOS
     const confirmarPedido=()=>{
         setEnviar(true);
-        setStatus("Restaurnte preparando seu pedido...");
+        setStatus("Restaurante preparando seu pedido...");
         setTimeout(()=>{
             setStatus("Seu pedido saiu para entrega!")
             setEnviar(false)
@@ -61,13 +64,49 @@ const Pedido = () => {
         },10000);
     }
 
-
-
-
   return (
-    <>
-      
-    </>
+      <div className="container">
+          <h2>Cardápio do Restaurante</h2>
+          {produtosDisponiveis.map(produto => (
+              <div key={produto.id} className="item-cardapio">
+                  <span>{produto.nome}(R$ {produto.preco.toFixed(2)})</span>
+                  <div className="item-controles">
+                      <button onClick={() => alterarQuantidade(produto.id, -1)} className="btn-qtn">-</button>
+                      <span>{produto.quantidade}</span>
+                      <button onClick={() => alterarQuantidade(produto.id, +1)} className="btn-qtn">+</button>
+                  </div>
+              </div>
+          ))}
+
+
+            <hr className="linha"/>
+            <h3>Resumo da Entrega</h3>
+            {carrinho.length === 0 ?(
+             <p>Seu carrinho está vazio</p>
+            ):(
+            <>
+                <ul className="resumo-lista">
+                    {carrinho.map(item => (
+                        <li key={item.id}>
+                            {item.quantidade} X {item.nome}-R$ {(item.preco * item.quantidade.toFixed(2))}
+                        </li>
+                    ))}
+                </ul>
+                <p>Subtotal: R${subtotal.toFixed(2)}</p>
+                <p>Taxa de Entrega: R${taxaEntrega.toFixed(2)}</p>
+                <strong className="total">Total a pagar: R${total.toFixed(2)}</strong>
+
+                <button className="btn-confirmar" onClick={confirmarPedido} disabled={enviar}>
+                    {enviar ? "Enviando...":"Confirmar Pedido"}
+                </button>
+            </>
+            )}
+            {status && (
+                <div className="alerta-status">
+                    <strong>Alerta:</strong>{status}
+                </div>
+            )}
+      </div>
   )
 }
 
